@@ -23,11 +23,36 @@ SimulateData <- function( n, a, mu, sd, square=TRUE){
     getSample <- ifelse(all(table(D,trt)) > 0, FALSE, TRUE)
     if(getSample) print("Had to resample")
   }
-  out <- data.frame("event" = D, "trt" = trt, "marker" = Y)
+  out <- data.frame("event" = D,"marker" = Y, "trt" = trt)
   return(out)
   
 } 
-  
+ 
+
+
+expit = function(x) exp(x)/(1+exp(x))
+
 #calculate the true value of theta given logistic pars
+
+
+#calculate the ci for alpha
+
+#estimate the coefficients in the logistic model
+EstCoefs= function (X){
+ 
+  sum.coefs = summary(glm(event~trt*marker, data =X,  family=binomial()))$coef;
+  #pars = mean(X[X[,3]==1,1]) - mean(X[X[,3]==0,1])
+
+  return (
+    list(coefs = sum.coefs[,1], 
+         ci = sum.coefs[,1] + cbind(-1.96*sum.coefs[,2], +1.96*sum.coefs[,2]), 
+         p.value = sum.coefs[,4]) 
+  )
+}
+
+cover <- function(low, high, val) return(low < val & high > val)
+
+
+
 
 
