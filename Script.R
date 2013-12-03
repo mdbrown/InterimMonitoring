@@ -18,11 +18,11 @@ square <- FALSE
 # strong marker
 #sample size needed for criteria 1 
 # 80% power 100, 90% power 150
-
+mybeta <- c(-1.2402598, -0.6910426, 0.6, -2.25)
 mybeta <-  c( -1.24, -0.29,  0.6, -1.5)
 mymean <- 0; mysd <- 1
 square <- FALSE
-
+calcTruth(a=mybeta, f = dnorm)
 #onc-dx marker 
 #sample size needed for criteria 1 
 # 80% power 1475, 90% power 1975
@@ -30,11 +30,19 @@ square <- FALSE
 mybeta <-  c(-2.236,.4, .037,-0.0192)
 mymean <- 4.84; mysd <- 1.8
 square <- TRUE
+calcTruth(a=mybeta, f = f.y.onc)
+
 
 #null marker 
 mybeta<-c(-1.23, -0.09, .6, 0)  
 mymean <- 0; mysd <- 1
 square <- FALSE
+
+
+
+
+
+calcTruth(a=mybeta, f=dnorm)$value
 
 
 #Simulate Data
@@ -139,6 +147,10 @@ for( m in 1:M){
 }
 
 
-save(output.IM, output.ALL, file = "nullTrue_weakAlt.Rdata")
+save(output.IM, output.ALL, file = "weakTrue_nullAlt.Rdata")
+
+
+
+
 
   

@@ -52,7 +52,17 @@ EstCoefs= function (X){
 
 cover <- function(low, high, val) return(low < val & high > val)
 
+calcTruth <- function(a, f){
+
+ risk.t0 <- function(x) expit(a[1] + a[3]*x)
+ risk.t1 <- function(x) expit(a[1] + a[2] + (a[3]+a[4])*x)
+ d = integrate(f, lower = -Inf, upper= -a[2]/a[4])
+ theta <- integrate(f = function(x, a){(risk.t1(x)-risk.t0(x))*(f(x)/d$value)*I(x < -a[2]/a[4])}, lower = -10, upper = 10,  a = a)
+
+ theta
+}
 
 
-
+f.y.str = function(y) dnorm(y, mean = 0, sd = 1)
+f.y.onc = function(y) (0.5*(y^(-.5)))*(dnorm(sqrt(y), mean=4.84, sd=1.8)+ dnorm(-sqrt(y), mean=4.84, sd=1.8))
 
