@@ -50,16 +50,67 @@ EstCoefs= function (X){
   )
 }
 
+
+
+
+
+
+estEta = function (X){
+  y = X[,1]; ## X has form cbind(R, Y, T)
+  dMat = cbind (1, X[,2], X[,3], X[,3]*X[,2]);
+  etaHat = glm.fit (dMat, y, family=binomial())$coefficients;
+  
+  pars = mean(X[X[,3]==1,1]) - mean(X[X[,3]==0,1])
+  
+  return (list(out = etaHat, pars = pars)); 
+}
+
+
+#estimate Theta 
+### alternatively you could use fXEtaThetaC for a function that uses C to calculate this (found in ../C/Code.cpp)
+estTheta = function (x, eta){
+
+  eta = eta$out
+  dPos = cbind(1, x, 1, x);
+  dNeg = cbind(1, x, 0, x*0);
+  mPos = dPos%*%eta;
+  mNeg = dNeg%*%eta;
+  deltaVal = exp (mPos)/(1+exp(mPos)) - exp (mNeg)/(1+exp(mNeg));
+  
+  mean(pmax(deltaVal, 0), na.rm =TRUE);
+}
+
+bootEstTheta<- function(X){
+  
+  sampleind <- sample.int(nrow(X), replace = TRUE)
+  
+  estTheta(X[sampleind,2], estEta(X[sampleind,]))
+  
+}
+
+
+EstimateTheta <- function(X, bootstraps = 500){
+  
+  bootThetas <- (replicate(bootEstTheta(X), n = bootstraps))
+  ci = quantile(bootThetas, probs = c(.025, 0.975), na.rm=TRUE)
+  
+  theta <- estTheta(X[,2], estEta(X))
+  
+  list(thetaEst = theta, ci = ci)
+}
+
 cover <- function(low, high, val) return(low < val & high > val)
 
-calcTruth <- function(a, f){
+calcTruth <- function(a, f, lower.bound = -10, upper.bound = 10){
 
  risk.t0 <- function(x) expit(a[1] + a[3]*x)
  risk.t1 <- function(x) expit(a[1] + a[2] + (a[3]+a[4])*x)
- d = integrate(f, lower = -Inf, upper= -a[2]/a[4])
- theta <- integrate(f = function(x, a){(risk.t1(x)-risk.t0(x))*(f(x)/d$value)*I(x < -a[2]/a[4])}, lower = -10, upper = 10,  a = a)
-
- theta
+ pneg = integrate(f, lower = lower.bound, upper= -a[2]/a[4])
+ theta <- integrate(f = function(x, a){(risk.t1(x)-risk.t0(x))*(f(x))*I(x < -a[2]/a[4])}, lower = lower.bound, upper = upper.bound,  a = a)
+ 
+ list(theta = theta$value, 
+      pneg = pneg$value, 
+      bneg = theta$value/pneg$value)
 }
 
 
