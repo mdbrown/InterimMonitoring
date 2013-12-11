@@ -73,7 +73,7 @@ mybeta
 # run a small simulation where the marker has null performance, 
 #but we expect it to have the performance of the weak sim marker
 M = 1000
-altVal <- 0.02 #we expect the performance of the weak sim marker
+altVal <- 0.01 #we expect the performance of the weak sim marker
 startN <- 100
 endN <- 1050
 
@@ -115,7 +115,7 @@ for( m in 1:M){
 }
 
 
-save(output.IM, output.ALL, file = "nullTrue_weakAlt.Rdata")
+save(output.IM, output.ALL, file = "nullTrue_weakAlt_Theta.Rdata")
 
 #now the truth will be the weak marker and we will see how much interim monitoring reduces power
 
